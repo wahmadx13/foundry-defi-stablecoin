@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {DecentralizedStableCoin} from "src/DecentralizedStableCoin.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { DecentralizedStableCoin } from "src/DecentralizedStableCoin.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title DSCEngine
@@ -16,9 +16,11 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  *
  * It is similar to DAI if DAI had no governance, no fees, and was only backed by WETH and WBTC.
  *
- * Our DSC system should always be "overcollateralized". At noint, should the value of all collateral <= the $ backed value of all DSC.
+ * Our DSC system should always be "overcollateralized". At noint, should the value of all collateral <= the $ backed
+ * value of all DSC.
  *
- * @notice This contract is the core of DSC System. It handles all the logic for mining and redeeming DSC, as well as depositing & withdrawing collateral.
+ * @notice This contract is the core of DSC System. It handles all the logic for mining and redeeming DSC, as well as
+ * depositing & withdrawing collateral.
  * @notice This contract is VERY loosely based on the MakerDAO DSS (DAI) system.
  */
 contract DSCEngine is ReentrancyGuard {
@@ -34,19 +36,14 @@ contract DSCEngine is ReentrancyGuard {
     // State Variables //
     /////////////////////
     mapping(address token => address priceFeed) private s_priceFeeds; // tokenToPriceFeed
-    mapping(address user => mapping(address token => uint256 amount))
-        private s_collateralDeposited;
+    mapping(address user => mapping(address token => uint256 amount)) private s_collateralDeposited;
 
     DecentralizedStableCoin private immutable i_dsc;
 
     /////////////////////
     // Events          //
     /////////////////////
-    event CollateralDeposited(
-        address indexed user,
-        address indexed token,
-        uint256 amount
-    );
+    event CollateralDeposited(address indexed user, address indexed token, uint256 amount);
 
     /////////////////////
     // Modifiers       //
@@ -68,11 +65,7 @@ contract DSCEngine is ReentrancyGuard {
     /////////////////////
     // Functions       //
     /////////////////////
-    constructor(
-        address[] memory tokenAddresses,
-        address[] memory priceFeedAddresses,
-        address dscAddress
-    ) {
+    constructor(address[] memory tokenAddresses, address[] memory priceFeedAddresses, address dscAddress) {
         // USD Price Feeds
         if (tokenAddresses.length != priceFeedAddresses.length) {
             revert DSCEngine__TokenAddressesAndPriceFeedAddressesMustBeSameLength();
@@ -87,7 +80,7 @@ contract DSCEngine is ReentrancyGuard {
     ////////////////////////
     // External Functions //
     ////////////////////////
-    function depositCollateralAndMintDSC() external {}
+    function depositCollateralAndMintDSC() external { }
 
     /**
      * @notice Follows CEI (Checks Effects Interactions) pattern
@@ -103,34 +96,24 @@ contract DSCEngine is ReentrancyGuard {
         isAllowedToken(tokenCollateralAddress)
         nonReentrant
     {
-        s_collateralDeposited[msg.sender][
-            tokenCollateralAddress
-        ] += amountCollateral;
-        emit CollateralDeposited(
-            msg.sender,
-            tokenCollateralAddress,
-            amountCollateral
-        );
-        bool success = IERC20(tokenCollateralAddress).transferFrom(
-            msg.sender,
-            address(this),
-            amountCollateral
-        );
+        s_collateralDeposited[msg.sender][tokenCollateralAddress] += amountCollateral;
+        emit CollateralDeposited(msg.sender, tokenCollateralAddress, amountCollateral);
+        bool success = IERC20(tokenCollateralAddress).transferFrom(msg.sender, address(this), amountCollateral);
 
         if (!success) {
             revert DSCEngine__TransferFailed();
         }
     }
 
-    function redeemCollateralForDsc() external {}
+    function redeemCollateralForDsc() external { }
 
-    function redeemCollateral() external {}
+    function redeemCollateral() external { }
 
-    function mintDsc() external {}
+    function mintDsc() external { }
 
-    function burnDsc() external {}
+    function burnDsc() external { }
 
-    function liquidate() external {}
+    function liquidate() external { }
 
-    function getHealthFactor() external view {}
+    function getHealthFactor() external view { }
 }
