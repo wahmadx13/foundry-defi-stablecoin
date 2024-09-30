@@ -58,7 +58,7 @@ contract HelperConfig is Script {
             BTC_USD_PRICE
         );
         ERC20Mock wbtcMock = new ERC20Mock("WBTC", "WBTC", msg.sender, 1000e8);
-        vm.startBroadcast();
+        vm.stopBroadcast();
 
         return
             NetworkConfig({
