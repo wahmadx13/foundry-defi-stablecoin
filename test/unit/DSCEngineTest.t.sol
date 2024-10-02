@@ -29,6 +29,18 @@ contract DSCEngineTest is Test {
         ERC20Mock(weth).mint(USER, STARTING_ERC20_BALANCE);
     }
 
+    ///////////////////
+    // Modifiers //////
+    ///////////////////
+
+    modifier depositedCollateral() {
+        vm.startPrank(USER);
+        ERC20Mock(weth).approve(address(dscEngine), AMOUNT_COLLATERAL);
+        dscEngine.depositCollateral(weth, AMOUNT_COLLATERAL);
+        vm.stopPrank();
+        _;
+    }
+
     //////////////////////////
     // Constructor Test //////
     //////////////////////////
@@ -91,5 +103,21 @@ contract DSCEngineTest is Test {
         vm.expectRevert(DSCEngine.DSCEngine__NotAllowedToken.selector);
         dscEngine.depositCollateral(address(ranToken), AMOUNT_COLLATERAL);
         vm.stopPrank();
+    }
+
+    function testCanDepositAmountCollateralAndGetAccountInfo()
+        public
+        depositedCollateral
+    {
+        (uint256 totalDscMinted, uint256 collateralValueInUsd) = dscEngine
+            .getAccountInformation(USER);
+
+        uint256 expectedTotalDscMinted = 0;
+        uint256 expectedDepositedAmount = dscEngine.getTokenAmountFromUsd(
+            weth,
+            collateralValueInUsd
+        );
+        assertEq(totalDscMinted, expectedTotalDscMinted);
+        assertEq(AMOUNT_COLLATERAL, expectedDepositedAmount);
     }
 }
